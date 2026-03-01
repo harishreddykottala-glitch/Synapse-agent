@@ -4,6 +4,7 @@ Supports:
 - Google Gemini via google-genai SDK
 - Ollama via OpenAI-compatible API (local, no rate limits)
 - Groq via OpenAI-compatible API
+- Grok (xAI) via OpenAI-compatible API
 
 Includes retry logic with exponential backoff for rate limits.
 """
@@ -24,7 +25,7 @@ BASE_DELAY = 2.0  # seconds
 
 
 class LLMProvider:
-    """Unified LLM interface supporting Gemini, Ollama, and Groq."""
+    """Unified LLM interface supporting Gemini, Ollama, Groq, and Grok (xAI)."""
 
     def __init__(self, model: str = None, api_key: str = None, provider: str = None):
         self.provider = provider or os.getenv("LLM_PROVIDER", "ollama")
@@ -32,6 +33,7 @@ class LLMProvider:
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY", "")
         self.ollama_base = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self.groq_api_key = os.getenv("GROQ_API_KEY", "")
+        self.xai_api_key = os.getenv("XAI_API_KEY", "")
 
         # Only import google genai if using gemini
         self._gemini_client = None
@@ -56,6 +58,12 @@ class LLMProvider:
                 messages, temperature, response_format,
                 base_url="https://api.groq.com/openai/v1",
                 api_key=self.groq_api_key,
+            )
+        elif self.provider == "grok":
+            return await self._chat_openai_compatible(
+                messages, temperature, response_format,
+                base_url="https://api.x.ai/v1",
+                api_key=self.xai_api_key,
             )
         else:
             return await self._chat_gemini(messages, temperature, response_format)

@@ -15,6 +15,7 @@ class Config:
     llm_provider: str = field(default_factory=lambda: os.getenv("LLM_PROVIDER", "google_genai"))
     llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gemini-2.0-flash"))
     google_api_key: str = field(default_factory=lambda: os.getenv("GOOGLE_API_KEY", ""))
+    xai_api_key: str = field(default_factory=lambda: os.getenv("XAI_API_KEY", ""))
 
     # Server
     host: str = field(default_factory=lambda: os.getenv("HOST", "0.0.0.0"))
